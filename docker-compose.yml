@@ -1,0 +1,107 @@
+# =============================================================================
+# Docker Compose — 3 Ubuntu VMs (20.04, 22.04, 24.04)
+# =============================================================================
+# Spin up:   docker compose up -d
+# Tear down: docker compose down
+# SSH into:  ssh dev@localhost -p 2220   (Ubuntu 20)
+#            ssh dev@localhost -p 2222   (Ubuntu 22)
+#            ssh dev@localhost -p 2224   (Ubuntu 24)
+# Password:  dev / dev   or   root / ubuntu
+# =============================================================================
+
+name: ubuntu-vms
+
+services:
+
+  # ── Ubuntu 20.04 ───────────────────────────────────────────────────
+  ubuntu20:
+    build:
+      context: ./ubuntu20
+      dockerfile: Dockerfile
+    container_name: ubuntu20-vm
+    hostname: ubuntu20
+    image: ubuntu-vm:20.04
+    ports:
+      - "2220:22"               # SSH → localhost:2220
+    volumes:
+      - ubuntu20-data:/home/dev
+    networks:
+      vm-net:
+        ipv4_address: 172.20.0.20
+    restart: unless-stopped
+    cap_add:
+      - SYS_ADMIN               # for certain system-level operations
+    healthcheck:
+      test: ["CMD", "pgrep", "sshd"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ── Ubuntu 22.04 ───────────────────────────────────────────────────
+  ubuntu22:
+    build:
+      context: ./ubuntu22
+      dockerfile: Dockerfile
+    container_name: ubuntu22-vm
+    hostname: ubuntu22
+    image: ubuntu-vm:22.04
+    ports:
+      - "2222:22"               # SSH → localhost:2222
+    volumes:
+      - ubuntu22-data:/home/dev
+    networks:
+      vm-net:
+        ipv4_address: 172.20.0.22
+    restart: unless-stopped
+    cap_add:
+      - SYS_ADMIN
+    healthcheck:
+      test: ["CMD", "pgrep", "sshd"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ── Ubuntu 24.04 ───────────────────────────────────────────────────
+  ubuntu24:
+    build:
+      context: ./ubuntu24
+      dockerfile: Dockerfile
+    container_name: ubuntu24-vm
+    hostname: ubuntu24
+    image: ubuntu-vm:24.04
+    ports:
+      - "2224:22"               # SSH → localhost:2224
+    volumes:
+      - ubuntu24-data:/home/dev
+    networks:
+      vm-net:
+        ipv4_address: 172.20.0.24
+    restart: unless-stopped
+    cap_add:
+      - SYS_ADMIN
+    healthcheck:
+      test: ["CMD", "pgrep", "sshd"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+# ── Shared Network ──────────────────────────────────────────────────
+networks:
+  vm-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
+
+# ── Persistent Volumes ─────────────────────────────────────────────
+volumes:
+  ubuntu20-data:
+    name: ubuntu20-home-data
+  ubuntu22-data:
+    name: ubuntu22-home-data
+  ubuntu24-data:
+    name: ubuntu24-home-data
