@@ -1,36 +1,68 @@
 # =============================================================================
-# Docker Compose — 3 Ubuntu VMs (20.04, 22.04, 24.04)
+# Docker Compose — 6 Ubuntu CIS Assessment Targets
 # =============================================================================
-# Spin up:   docker compose up -d
-# Tear down: docker compose down
-# SSH into:  ssh dev@localhost -p 2220   (Ubuntu 20)
-#            ssh dev@localhost -p 2222   (Ubuntu 22)
-#            ssh dev@localhost -p 2224   (Ubuntu 24)
-# Password:  dev / dev   or   root / ubuntu
+# Folder Convention:
+#   ubuntu_20_optim/
+#   ubuntu_20_mix/
+#   ubuntu_22_optim/
+#   ubuntu_22_mix/
+#   ubuntu_24_optim/
+#   ubuntu_24_mix/
+#
+# Start:
+#   docker compose up -d --build
+#
+# Stop:
+#   docker compose down
+#
+# SSH:
+#   Ubuntu 20 Optimized: ssh dev@localhost -p 2220
+#   Ubuntu 20 Mixed:     ssh dev@localhost -p 2221
+#   Ubuntu 22 Optimized: ssh dev@localhost -p 2222
+#   Ubuntu 22 Mixed:     ssh dev@localhost -p 2223
+#   Ubuntu 24 Optimized: ssh dev@localhost -p 2224
+#   Ubuntu 24 Mixed:     ssh dev@localhost -p 2225
+#
+# Credentials:
+#   User: dev
+#   Password: dev
+#
+#   Root:
+#   User: root
+#   Password: ubuntu
 # =============================================================================
 
-name: ubuntu-vms
+name: ubuntu-cis-targets
 
 services:
 
-  # ── Ubuntu 20.04 ───────────────────────────────────────────────────
-  ubuntu20:
+  # ===========================================================================
+  # Ubuntu 20.04 — Optimized
+  # ===========================================================================
+
+  ubuntu20-optim:
     build:
-      context: ./ubuntu20
+      context: ./ubuntu_20_optim
       dockerfile: Dockerfile
-    container_name: ubuntu20-vm
-    hostname: ubuntu20
-    image: ubuntu-vm:20.04
+
+    container_name: ubuntu20-optim-vm
+    hostname: ubuntu20-optim
+
     ports:
-      - "2220:22"               # SSH → localhost:2220
+      - "2220:22"
+
     volumes:
-      - ubuntu20-data:/home/dev
+      - ubuntu20-optim-data:/home/dev
+
     networks:
       vm-net:
         ipv4_address: 172.20.0.20
+
     restart: unless-stopped
+
     cap_add:
-      - SYS_ADMIN               # for certain system-level operations
+      - SYS_ADMIN
+
     healthcheck:
       test: ["CMD", "pgrep", "sshd"]
       interval: 10s
@@ -38,24 +70,69 @@ services:
       retries: 3
       start_period: 10s
 
-  # ── Ubuntu 22.04 ───────────────────────────────────────────────────
-  ubuntu22:
+
+  # ===========================================================================
+  # Ubuntu 20.04 — Mixed
+  # ===========================================================================
+
+  ubuntu20-mix:
     build:
-      context: ./ubuntu22
+      context: ./ubuntu_20_mix
       dockerfile: Dockerfile
-    container_name: ubuntu22-vm
-    hostname: ubuntu22
-    image: ubuntu-vm:22.04
+
+    container_name: ubuntu20-mix-vm
+    hostname: ubuntu20-mix
+
     ports:
-      - "2222:22"               # SSH → localhost:2222
+      - "2221:22"
+
     volumes:
-      - ubuntu22-data:/home/dev
+      - ubuntu20-mix-data:/home/dev
+
+    networks:
+      vm-net:
+        ipv4_address: 172.20.0.21
+
+    restart: unless-stopped
+
+    cap_add:
+      - SYS_ADMIN
+
+    healthcheck:
+      test: ["CMD", "pgrep", "sshd"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+
+  # ===========================================================================
+  # Ubuntu 22.04 — Optimized
+  # ===========================================================================
+
+  ubuntu22-optim:
+    build:
+      context: ./ubuntu_22_optim
+      dockerfile: Dockerfile
+
+    container_name: ubuntu22-optim-vm
+    hostname: ubuntu22-optim
+
+    ports:
+      - "2222:22"
+
+    volumes:
+      - ubuntu22-optim-data:/home/dev
+
     networks:
       vm-net:
         ipv4_address: 172.20.0.22
+
     restart: unless-stopped
+
     cap_add:
       - SYS_ADMIN
+
     healthcheck:
       test: ["CMD", "pgrep", "sshd"]
       interval: 10s
@@ -63,24 +140,69 @@ services:
       retries: 3
       start_period: 10s
 
-  # ── Ubuntu 24.04 ───────────────────────────────────────────────────
-  ubuntu24:
+
+  # ===========================================================================
+  # Ubuntu 22.04 — Mixed
+  # ===========================================================================
+
+  ubuntu22-mix:
     build:
-      context: ./ubuntu24
+      context: ./ubuntu_22_mix
       dockerfile: Dockerfile
-    container_name: ubuntu24-vm
-    hostname: ubuntu24
-    image: ubuntu-vm:24.04
+
+    container_name: ubuntu22-mix-vm
+    hostname: ubuntu22-mix
+
     ports:
-      - "2224:22"               # SSH → localhost:2224
+      - "2223:22"
+
     volumes:
-      - ubuntu24-data:/home/dev
+      - ubuntu22-mix-data:/home/dev
+
+    networks:
+      vm-net:
+        ipv4_address: 172.20.0.23
+
+    restart: unless-stopped
+
+    cap_add:
+      - SYS_ADMIN
+
+    healthcheck:
+      test: ["CMD", "pgrep", "sshd"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+
+  # ===========================================================================
+  # Ubuntu 24.04 — Optimized
+  # ===========================================================================
+
+  ubuntu24-optim:
+    build:
+      context: ./ubuntu_24_optim
+      dockerfile: Dockerfile
+
+    container_name: ubuntu24-optim-vm
+    hostname: ubuntu24-optim
+
+    ports:
+      - "2224:22"
+
+    volumes:
+      - ubuntu24-optim-data:/home/dev
+
     networks:
       vm-net:
         ipv4_address: 172.20.0.24
+
     restart: unless-stopped
+
     cap_add:
       - SYS_ADMIN
+
     healthcheck:
       test: ["CMD", "pgrep", "sshd"]
       interval: 10s
@@ -88,20 +210,77 @@ services:
       retries: 3
       start_period: 10s
 
-# ── Shared Network ──────────────────────────────────────────────────
+
+  # ===========================================================================
+  # Ubuntu 24.04 — Mixed
+  # ===========================================================================
+
+  ubuntu24-mix:
+    build:
+      context: ./ubuntu_24_mix
+      dockerfile: Dockerfile
+
+    container_name: ubuntu24-mix-vm
+    hostname: ubuntu24-mix
+
+    ports:
+      - "2225:22"
+
+    volumes:
+      - ubuntu24-mix-data:/home/dev
+
+    networks:
+      vm-net:
+        ipv4_address: 172.20.0.25
+
+    restart: unless-stopped
+
+    cap_add:
+      - SYS_ADMIN
+
+    healthcheck:
+      test: ["CMD", "pgrep", "sshd"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+
+# =============================================================================
+# Shared Network
+# =============================================================================
+
 networks:
+
   vm-net:
     driver: bridge
+
     ipam:
       config:
         - subnet: 172.20.0.0/16
           gateway: 172.20.0.1
 
-# ── Persistent Volumes ─────────────────────────────────────────────
+
+# =============================================================================
+# Persistent Volumes
+# =============================================================================
+
 volumes:
-  ubuntu20-data:
-    name: ubuntu20-home-data
-  ubuntu22-data:
-    name: ubuntu22-home-data
-  ubuntu24-data:
-    name: ubuntu24-home-data
+
+  ubuntu20-optim-data:
+    name: ubuntu20-optim-home-data
+
+  ubuntu20-mix-data:
+    name: ubuntu20-mix-home-data
+
+  ubuntu22-optim-data:
+    name: ubuntu22-optim-home-data
+
+  ubuntu22-mix-data:
+    name: ubuntu22-mix-home-data
+
+  ubuntu24-optim-data:
+    name: ubuntu24-optim-home-data
+
+  ubuntu24-mix-data:
+    name: ubuntu24-mix-home-data
