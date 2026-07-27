@@ -8,8 +8,8 @@
 # Build and start all containers
 docker compose up -d --build
 
-# Stop and remove all containers
-docker compose down
+# Stop and remove all containers. This is important. If you donot remove containers with their volumes. It will consume a lot of space. 
+docker compose down -v
 
 # Rebuild a specific container
 docker compose build ubuntu20-optim
