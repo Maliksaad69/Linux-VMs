@@ -1,0 +1,10 @@
+Container,Port,SSH Command
+ubuntu20-base,2226,ssh dev@localhost -p 2226
+ubuntu20-optim,2220,ssh dev@localhost -p 2220
+ubuntu20-mix,2221,ssh dev@localhost -p 2221
+ubuntu22-base,2227,ssh dev@localhost -p 2227
+ubuntu22-optim,2222,ssh dev@localhost -p 2222
+ubuntu22-mix,2223,ssh dev@localhost -p 2223
+ubuntu24-base,2228,ssh dev@localhost -p 2228
+ubuntu24-optim,2224,ssh dev@localhost -p 2224
+ubuntu24-mix,2225,ssh dev@localhost -p 2225

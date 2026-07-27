@@ -1,13 +1,16 @@
 # =============================================================================
-# Docker Compose — 6 Ubuntu CIS Assessment Targets
+# Docker Compose — 9 Ubuntu CIS Assessment Targets
 # =============================================================================
 # Folder Convention:
-#   ubuntu_20_optim/
-#   ubuntu_20_mix/
-#   ubuntu_22_optim/
-#   ubuntu_22_mix/
-#   ubuntu_24_optim/
-#   ubuntu_24_mix/
+#   ubuntu20/        ubuntu20_base/
+#   ubuntu_20_optim/  ubuntu_20_optimized/
+#   ubuntu_20_mix/    ubuntu_20_mixed/
+#   ubuntu22/        ubuntu22_base/
+#   ubuntu_22_optim/  ubuntu_22_optimized/
+#   ubuntu_22_mix/    ubuntu_22_mixed/
+#   ubuntu24/        ubuntu24_base/
+#   ubuntu_24_optim/  ubuntu_24_optimized/
+#   ubuntu_24_mix/    ubuntu_24_mixed/
 #
 # Start:
 #   docker compose up -d --build
@@ -16,12 +19,15 @@
 #   docker compose down
 #
 # SSH:
-#   Ubuntu 20 Optimized: ssh dev@localhost -p 2220
-#   Ubuntu 20 Mixed:     ssh dev@localhost -p 2221
-#   Ubuntu 22 Optimized: ssh dev@localhost -p 2222
-#   Ubuntu 22 Mixed:     ssh dev@localhost -p 2223
-#   Ubuntu 24 Optimized: ssh dev@localhost -p 2224
-#   Ubuntu 24 Mixed:     ssh dev@localhost -p 2225
+#   Ubuntu 20 Base:       ssh dev@localhost -p 2226
+#   Ubuntu 20 Optimized:  ssh dev@localhost -p 2220
+#   Ubuntu 20 Mixed:      ssh dev@localhost -p 2221
+#   Ubuntu 22 Base:       ssh dev@localhost -p 2227
+#   Ubuntu 22 Optimized:  ssh dev@localhost -p 2222
+#   Ubuntu 22 Mixed:      ssh dev@localhost -p 2223
+#   Ubuntu 24 Base:       ssh dev@localhost -p 2228
+#   Ubuntu 24 Optimized:  ssh dev@localhost -p 2224
+#   Ubuntu 24 Mixed:      ssh dev@localhost -p 2225
 #
 # Credentials:
 #   User: dev
@@ -246,6 +252,111 @@ services:
       start_period: 10s
 
 
+# ===========================================================================
+  # Ubuntu 20.04 — Base
+  # ===========================================================================
+
+  ubuntu20-base:
+    build:
+      context: ./ubuntu20
+      dockerfile: Dockerfile
+
+    container_name: ubuntu20-base-vm
+    hostname: ubuntu20-base
+
+    ports:
+      - "2226:22"
+
+    volumes:
+      - ubuntu20-base-data:/home/dev
+
+    networks:
+      vm-net:
+        ipv4_address: 172.20.0.26
+
+    restart: unless-stopped
+
+    cap_add:
+      - SYS_ADMIN
+
+    healthcheck:
+      test: ["CMD", "pgrep", "sshd"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+
+  # ===========================================================================
+  # Ubuntu 22.04 — Base
+  # ===========================================================================
+
+  ubuntu22-base:
+    build:
+      context: ./ubuntu22
+      dockerfile: Dockerfile
+
+    container_name: ubuntu22-base-vm
+    hostname: ubuntu22-base
+
+    ports:
+      - "2227:22"
+
+    volumes:
+      - ubuntu22-base-data:/home/dev
+
+    networks:
+      vm-net:
+        ipv4_address: 172.20.0.27
+
+    restart: unless-stopped
+
+    cap_add:
+      - SYS_ADMIN
+
+    healthcheck:
+      test: ["CMD", "pgrep", "sshd"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+
+  # ===========================================================================
+  # Ubuntu 24.04 — Base
+  # ===========================================================================
+
+  ubuntu24-base:
+    build:
+      context: ./ubuntu24
+      dockerfile: Dockerfile
+
+    container_name: ubuntu24-base-vm
+    hostname: ubuntu24-base
+
+    ports:
+      - "2228:22"
+
+    volumes:
+      - ubuntu24-base-data:/home/dev
+
+    networks:
+      vm-net:
+        ipv4_address: 172.20.0.28
+
+    restart: unless-stopped
+
+    cap_add:
+      - SYS_ADMIN
+
+    healthcheck:
+      test: ["CMD", "pgrep", "sshd"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+
 # =============================================================================
 # Shared Network
 # =============================================================================
@@ -284,3 +395,12 @@ volumes:
 
   ubuntu24-mix-data:
     name: ubuntu24-mix-home-data
+
+  ubuntu20-base-data:
+    name: ubuntu20-base-home-data
+
+  ubuntu22-base-data:
+    name: ubuntu22-base-home-data
+
+  ubuntu24-base-data:
+    name: ubuntu24-base-home-data
